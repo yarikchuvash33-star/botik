@@ -10,8 +10,6 @@ from aiogram.types import (
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.client.session.aiohttp import AiohttpSession
-from aiogram.client.telegram import TelegramAPIServer
 
 import database as db
 import games
@@ -439,11 +437,8 @@ async def slots_spin(call: CallbackQuery):
 async def main():
     await db.init_db()
     
-    # ПОДМЕНА API НА ТВОЙ CLOUDFLARE WORKER
-    session = AiohttpSession(
-        api=TelegramAPIServer.from_base("https://super-dream-e991.yarkchuvash33.workers.dev")
-    )
-    bot = Bot(token=BOT_TOKEN, session=session)
+    # ВЕРСИЯ ДЛЯ RENDER (БЕЗ ПРОКСИ)
+    bot = Bot(token=BOT_TOKEN)
     
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router)
