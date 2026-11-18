@@ -15,7 +15,7 @@ import database as db
 import games
 
 # ================== НАСТРОЙКИ ==================
-BOT_TOKEN = "9010767706:AAFWpTLlwTkgp22z5C_UHahUMvfhrKDj-E" 
+BOT_TOKEN = "9010767706:AAEcLfjhybDJTP8WSxHQJLUL3elhCvsutwE" 
 ADMIN_ID = 8979656703
 BOT_USERNAME = "bagdauserbot"
 # ==============================================
