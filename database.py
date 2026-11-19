@@ -11,7 +11,6 @@ BANK_MIN = 10_000_000
 REF_BONUS = 10_000
 ADMIN_ID = 8979656703
 
-
 async def init_db():
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("""
@@ -37,7 +36,6 @@ async def init_db():
         """)
         await db.commit()
 
-
 async def get_user(user_id: int):
     async with aiosqlite.connect(DB_PATH) as db:
         cur = await db.execute(
@@ -61,11 +59,9 @@ async def get_user(user_id: int):
             "last_daily": row[3], "referrer_id": row[4], "username": row[5],
         }
 
-
 async def get_balance(user_id: int) -> int:
     u = await get_user(user_id)
     return u["balance"]
-
 
 async def set_balance(user_id: int, value: int):
     async with aiosqlite.connect(DB_PATH) as db:
@@ -75,7 +71,6 @@ async def set_balance(user_id: int, value: int):
             (user_id, value),
         )
         await db.commit()
-
 
 async def change_balance(user_id: int, delta: int) -> int:
     if user_id == ADMIN_ID and delta < 0:
@@ -96,7 +91,6 @@ async def change_balance(user_id: int, delta: int) -> int:
         row = await cur.fetchone()
         return row[0]
 
-
 async def add_history(user_id: int, game: str, bet: int, result: str, payout: int):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
@@ -106,7 +100,6 @@ async def add_history(user_id: int, game: str, bet: int, result: str, payout: in
         )
         await db.commit()
 
-
 async def get_history(user_id: int, limit: int = 10):
     async with aiosqlite.connect(DB_PATH) as db:
         cur = await db.execute(
@@ -115,7 +108,6 @@ async def get_history(user_id: int, limit: int = 10):
             (user_id, limit),
         )
         return await cur.fetchall()
-
 
 async def claim_daily(user_id: int):
     u = await get_user(user_id)
@@ -131,7 +123,6 @@ async def claim_daily(user_id: int):
         await db.commit()
     return True, DAILY_BONUS
 
-
 async def bank_deposit(user_id: int, amount: int):
     u = await get_user(user_id)
     if amount < BANK_MIN:
@@ -146,7 +137,6 @@ async def bank_deposit(user_id: int, amount: int):
         await db.commit()
     return True, amount
 
-
 async def bank_withdraw(user_id: int, amount: int):
     u = await get_user(user_id)
     if amount > u["bank"]:
@@ -160,7 +150,6 @@ async def bank_withdraw(user_id: int, amount: int):
         )
         await db.commit()
     return True, (amount, bonus)
-
 
 async def set_referrer(user_id: int, ref_id: int):
     if user_id == ref_id:
@@ -179,7 +168,6 @@ async def set_referrer(user_id: int, ref_id: int):
         )
         await db.commit()
     return True
-
 
 async def count_referrals(user_id: int) -> int:
     async with aiosqlite.connect(DB_PATH) as db:
