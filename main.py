@@ -1,6 +1,7 @@
 import asyncio
 import os
 import time
+from aiohttp import web
 from aiogram import Bot, Dispatcher, F, Router
 from aiogram.filters import CommandStart
 from aiogram.types import (
@@ -16,7 +17,7 @@ import database as db
 import games
 
 # ================== НАСТРОЙКИ ==================
-BOT_TOKEN = os.getenv("BOT_TOKEN", "9010767706:AAEcLfjhybDJTP8WSxHQJLUL3elhCvsutwE")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "8979656703"))
 BOT_USERNAME = os.getenv("BOT_USERNAME", "bagdauserbot")
 # ==============================================
@@ -534,8 +535,27 @@ async def slots_spin(call: CallbackQuery):
 
     await call.message.edit_text(text, parse_mode="HTML", reply_markup=kb)
 
+# ================== HTTP-СЕРВЕР ДЛЯ RENDER ==================
+async def health_check(request):
+    return web.Response(text="OK")
+
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get("/", health_check)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 10000))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    print(f"Web server started on port {port}")
+# ============================================================
+
 async def main():
     await db.init_db()
+
+    # Запускаем HTTP-сервер параллельно с ботом (для health check на Render)
+    asyncio.create_task(start_web_server())
+
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router)
